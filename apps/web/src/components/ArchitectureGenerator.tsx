@@ -7,7 +7,7 @@ import { Server, Database, Code2, FolderTree, ArrowRight, Loader2, Play, AlertTr
 // This would ideally be fetched from the Next.js API/FastAPI 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
 
-export function ArchitectureGenerator({ projectId, token, initialArchitecture }: { projectId: string, token: string, initialArchitecture: any }) {
+export function ArchitectureGenerator({ projectId, token, initialArchitecture, projectStatus }: { projectId: string, token: string, initialArchitecture: any, projectStatus?: any }) {
   const router = useRouter()
   const [architecture, setArchitecture] = useState(initialArchitecture)
   const [isGenerating, setIsGenerating] = useState(false)
