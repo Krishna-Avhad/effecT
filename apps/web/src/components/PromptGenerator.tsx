@@ -113,22 +113,30 @@ export function PromptGenerator({ projectId, token, initialPrompts }: { projectI
                   </span>
                   {prompt.title}
                 </h3>
-                <button
-                  onClick={() => handleCopy(prompt.id, prompt.content)}
-                  className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-emerald-600 px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow-[0_0_15px_-3px_rgba(16,185,129,0.4)]"
-                >
-                  {copiedId === prompt.id ? (
-                    <>
-                      <Check className="h-4 w-4 text-emerald-300" />
-                      <span className="text-emerald-50">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" />
-                      Copy Prompt
-                    </>
+                <div className="flex items-center gap-3">
+                  {prompt.tokenCount && (
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/50 text-xs font-medium text-emerald-400 border border-emerald-500/10 shadow-inner">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      {prompt.tokenCount.toLocaleString()} tokens
+                    </span>
                   )}
-                </button>
+                  <button
+                    onClick={() => handleCopy(prompt.id, prompt.content)}
+                    className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-emerald-600 px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow-[0_0_15px_-3px_rgba(16,185,129,0.4)]"
+                  >
+                    {copiedId === prompt.id ? (
+                      <>
+                        <Check className="h-4 w-4 text-emerald-300" />
+                        <span className="text-emerald-50">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        Copy Prompt
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
               <div className="p-6 bg-zinc-950/80 overflow-x-auto custom-scrollbar relative">
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAyNTUsIDI1NSwgMC4wMikiLz48L3N2Zz4=')] opacity-50 pointer-events-none"></div>

@@ -56,11 +56,29 @@ export default async function ProjectDetailPage(props: { params: Promise<{ id: s
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               Back to Dashboard
             </Link>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">{project.name}</h1>
-              <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-400 border border-indigo-500/20 shadow-[0_0_10px_-2px_rgba(99,102,241,0.3)]">
-                {project.status.toUpperCase()}
-              </span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">{project.name}</h1>
+                <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-400 border border-indigo-500/20 shadow-[0_0_10px_-2px_rgba(99,102,241,0.3)]">
+                  {project.status.toUpperCase()}
+                </span>
+                {project.modelUsed && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-400 border border-amber-500/20 shadow-[0_0_10px_-2px_rgba(245,158,11,0.2)]">
+                    <Sparkles className="h-3 w-3" />
+                    {project.modelUsed}
+                  </span>
+                )}
+              </div>
+              
+              {project.status === 'prompts_generated' && (
+                <a 
+                  href={`${API_BASE_URL}/projects/${project.id}/export`}
+                  className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-all shadow-[0_0_20px_-5px_rgba(99,102,241,0.5)] hover:scale-105 active:scale-95"
+                >
+                  <Server className="h-4 w-4" />
+                  Download Workspace
+                </a>
+              )}
             </div>
             <p className="text-zinc-400 max-w-2xl leading-relaxed">{project.description || 'No description provided'}</p>
           </div>

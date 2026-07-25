@@ -1,8 +1,12 @@
 import os
 import asyncio
+import io
+import zipfile
+import json
 from contextlib import asynccontextmanager
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from supabase import create_client, Client
@@ -206,3 +210,80 @@ async def delete_project(project_id: str, current_user = Depends(get_current_use
     
     await db.project.delete(where={"id": project_id})
     return {"message": "Project deleted successfully"}
+
+@app.get("/projects/{project_id}/export")
+async def export_workspace(project_id: str, current_user = Depends(get_current_user)):
+    project = await db.project.find_first(
+        where={"id": project_id, "userId": current_user.id},
+        include={"architecture": True, "prompts": True}
+    )
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if not project.architecture or not project.prompts:
+        raise HTTPException(status_code=400, detail="Project missing architecture or prompts")
+
+    # Create an in-memory ZIP file
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+        # Create folder structure
+        folder_structure = project.architecture.folderStructure
+        if isinstance(folder_structure, str):
+            try:
+                folder_structure = json.loads(folder_structure)
+            except:
+                pass
+                
+        def add_folders(items, current_path=""):
+            for item in items:
+                name = item.get("name", "")
+                item_type = item.get("type", "folder")
+                path = f"{current_path}{name}"
+                
+                if item_type == "folder" or item_type == "directory":
+                    path += "/"
+                    # Write an empty directory to the zip
+                    zip_file.writestr(path, "")
+                    children = item.get("children", [])
+                    add_folders(children, path)
+                else:
+                    # It's a file, we could create an empty file but usually we just want folders
+                    pass
+                    
+        if isinstance(folder_structure, list):
+            add_folders(folder_structure)
+            
+        # Create .cursorrules
+        cursorrules_content = f"""# Project: {project.name}
+Model Used: {project.modelUsed or 'gemini-3.5-flash'}
+
+## Architecture
+Frontend: {project.architecture.frontendStack}
+Backend: {project.architecture.backendStack}
+Database: {project.architecture.databaseStack}
+
+## Database Schema
+{json.dumps(project.architecture.databaseSchema, indent=2) if not isinstance(project.architecture.databaseSchema, str) else project.architecture.databaseSchema}
+
+## API Endpoints
+{json.dumps(project.architecture.apiEndpoints, indent=2) if not isinstance(project.architecture.apiEndpoints, str) else project.architecture.apiEndpoints}
+"""
+        zip_file.writestr(".cursorrules", cursorrules_content)
+        
+        # Add prompts
+        for i, prompt in enumerate(sorted(project.prompts, key=lambda p: p.order)):
+            filename = f"prompts/phase-{i+1}.md"
+            content = f"# {prompt.title}\n\n{prompt.content}"
+            zip_file.writestr(filename, content)
+
+    # Prepare response
+    zip_buffer.seek(0)
+    
+    return StreamingResponse(
+        iter([zip_buffer.getvalue()]),
+        media_type="application/x-zip-compressed",
+        headers={
+            "Content-Disposition": f"attachment; filename={project.name.replace(' ', '_')}_workspace.zip"
+        }
+    )

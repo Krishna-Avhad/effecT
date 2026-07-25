@@ -85,12 +85,24 @@ async def generate_prompts_task(project_id: str, db: Prisma):
         
         # Save to database
         for p in result.prompts:
+            token_count = None
+            try:
+                token_response = await asyncio.to_thread(
+                    client.models.count_tokens,
+                    model='gemini-3.5-flash',
+                    contents=p.content
+                )
+                token_count = token_response.total_tokens
+            except Exception as token_err:
+                print(f"Failed to count tokens: {token_err}")
+
             await db.prompt.create(
                 data={
                     "projectId": project_id,
                     "title": p.title,
                     "content": p.content,
-                    "order": p.order
+                    "order": p.order,
+                    "tokenCount": token_count
                 }
             )
         
