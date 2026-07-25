@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { LayoutDashboard, ArrowLeft, BrainCircuit, Target, LayoutTemplate, Sparkles, Server } from 'lucide-react'
+import { LayoutDashboard, ArrowLeft, BrainCircuit, Target, LayoutTemplate, Sparkles, Server } from '@/components/Icons'
 import Link from 'next/link'
 import { ArchitectureGenerator } from '@/components/ArchitectureGenerator'
 import { PromptGenerator } from '@/components/PromptGenerator'

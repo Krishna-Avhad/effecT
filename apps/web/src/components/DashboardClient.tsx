@@ -129,7 +129,7 @@ export function DashboardClient({ userEmail }: { userEmail: string }) {
                       project.status.includes('fail') ? 'bg-red-500/10 text-red-400 border-red-500/20' :
                       'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                     }`}>
-                      {project.status === 'draft' ? 'Draft' : project.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {project.status === 'draft' ? 'Draft' : project.status.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                     </span>
                   </div>
                   <h3 className="relative mb-2 text-lg font-semibold text-zinc-100 group-hover:text-white transition-colors">{project.name}</h3>
