@@ -149,5 +149,3 @@ docs/
 -   Cost estimation
 -   Sprint planning
 -   One-click deployment
-
--   hehe
